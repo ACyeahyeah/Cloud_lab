@@ -75,8 +75,9 @@ static void print_neighbors(const bool adjacent[ROW][COL], int row, int col, int
   }
 }
 
-bool solved()
+bool solved(int board[N])
 {
+  int (*chess)[COL] = (int (*)[COL])board;
   for (int row = 0; row < ROW; ++row) {
     // check row
     int occurs[10] = { 0 };

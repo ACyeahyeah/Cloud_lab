@@ -26,6 +26,11 @@ const int kRow = 100, kCol = 200, kBox = 300;
 
 struct Dance
 {
+    int board[N];
+    int spaces[N];
+    int nspaces;
+    // int (*chess)[COL] = (int (*)[COL])board;
+
     Column* root_;
     int*    inout_;
     Column* columns_[400];
@@ -33,6 +38,23 @@ struct Dance
     Node    nodes_[kMaxNodes];
     int     cur_node_;
 
+    void find_spaces()
+    {
+        nspaces = 0;
+        for (int cell = 0; cell < N; ++cell) {
+        if (board[cell] == 0)
+            spaces[nspaces++] = cell;
+        }
+    }
+
+    void input(const char in[N])
+    {
+        for (int cell = 0; cell < N; ++cell) {
+        board[cell] = in[cell] - '0';
+        assert(0 <= board[cell] && board[cell] <= NUM);
+        }
+        find_spaces();
+    }
     Column* new_column(int n = 0)
     {
         assert(cur_node_ < kMaxNodes);
@@ -90,8 +112,13 @@ struct Dance
         return kBox+box*10+val;
     }
 
-    Dance(int inout[81]) : inout_(inout), cur_node_(0)
+    Dance(const char puzzle[N])
     {
+        input(puzzle) ;
+        int *inout ;
+        inout_ = board ;
+        inout = board ;
+        cur_node_ = 0 ;
         stack_.reserve(100);
 
         root_ = new_column();
@@ -252,8 +279,11 @@ struct Dance
     }
 };
 
-bool solve_sudoku_dancing_links(int unused)
+bool solve_sudoku_dancing_links(const char puzzle[N], int unused)
 {
-  Dance d(board);
-  return d.solve();
+//   Dance d(board);
+    Dance d(puzzle) ;
+    return d.solve();
+    if (!solved(d.board))
+    assert(0);
 }
