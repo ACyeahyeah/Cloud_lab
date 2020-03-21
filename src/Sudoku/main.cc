@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
   char puzzle[128];
   int total_solved = 0;
   int total = 0;
-  bool (*solve)(int) = solve_sudoku_basic;
+  bool (*solve)(int) = solve_sudoku_dancing_links;
   if (argv[2] != NULL)
     if (argv[2][0] == 'a')
       solve = solve_sudoku_min_arity;
