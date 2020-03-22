@@ -55,6 +55,15 @@ struct Dance
         }
         find_spaces();
     }
+
+    void get_result(char * puzzle)
+    {
+        for (int cell = 0; cell < N; ++cell) {
+        puzzle[cell] = board[cell] + '0';
+        assert('0' <= puzzle[cell] && puzzle[cell] <= '9');
+        }
+    }
+
     Column* new_column(int n = 0)
     {
         assert(cur_node_ < kMaxNodes);
@@ -279,11 +288,18 @@ struct Dance
     }
 };
 
-bool solve_sudoku_dancing_links(const char puzzle[N], int unused)
+bool solve_sudoku_dancing_links(char puzzle[N], int unused)
 {
 //   Dance d(board);
     Dance d(puzzle) ;
-    return d.solve();
-    if (!solved(d.board))
-    assert(0);
+    bool a =  d.solve();
+    if (!solved(d.board) && a == true)
+        assert(0);
+    if (a){
+        d.get_result(puzzle) ;
+#if DEBUG_RES
+        printf("%s", puzzle) ;
+#endif 
+    }
+    return a ;
 }

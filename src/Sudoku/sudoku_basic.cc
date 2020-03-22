@@ -31,6 +31,14 @@ struct sudoku_basic
     }
     find_spaces();
   }
+  
+  void get_result(char * puzzle)
+  {
+    for (int cell = 0; cell < N; ++cell) {
+      puzzle[cell] = board[cell] + '0';
+      assert('0' <= puzzle[cell] && puzzle[cell] <= '9');
+    }
+  }
 
   bool available(int guess, int cell)
   {
@@ -72,12 +80,18 @@ struct sudoku_basic
   }
 };
 
-bool solve_sudoku_basic(const char puzzle[N], int which_space){
+bool solve_sudoku_basic(char * puzzle, int which_space){
   sudoku_basic basic ;
   basic.input(puzzle) ;
   bool a = basic.solve_sudoku_basic(which_space);
   if (!solved(basic.board) && a == true)
     assert(0);
+  if (a == true){
+    basic.get_result(puzzle) ;
+#if DEBUG_RES
+    printf("%s", puzzle) ;
+#endif 
+  }
   return a ;
 }
 

@@ -30,6 +30,15 @@ struct sudoku_min_arity
     }
     find_spaces();
   }
+
+  void get_result(char * puzzle)
+  {
+    for (int cell = 0; cell < N; ++cell) {
+      puzzle[cell] = board[cell] + '0';
+      assert('0' <= puzzle[cell] && puzzle[cell] <= '9');
+    }
+  }
+
   bool available(int guess, int cell)
   {
     for (int i = 0; i < NEIGHBOR; ++i) {
@@ -101,11 +110,17 @@ struct sudoku_min_arity
 };
 
 
-bool solve_sudoku_min_arity(const char puzzle[N], int which_space){
+bool solve_sudoku_min_arity(char puzzle[N], int which_space){
   sudoku_min_arity min ;
   min.input(puzzle) ;
   bool a = min.solve_sudoku_min_arity(which_space) ;
   if (!solved(min.board) && a == true)
     assert(0);
+  if (a){
+    min.get_result(puzzle) ;
+#if DEBUG_RES
+    printf("%s", puzzle) ;
+#endif 
+  }
   return a ;
 }

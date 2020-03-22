@@ -33,6 +33,15 @@ struct sudoku_min_arity_cache
     }
     find_spaces();
   }
+
+  void get_result(char * puzzle)
+  {
+    for (int cell = 0; cell < N; ++cell) {
+      puzzle[cell] = board[cell] + '0';
+      assert('0' <= puzzle[cell] && puzzle[cell] <= '9');
+    }
+  }
+
   // int arity(int cell)
   // {
   //   bool occupied[10] = {false};
@@ -132,13 +141,19 @@ struct sudoku_min_arity_cache
   }
 };
 
-bool solve_sudoku_min_arity_cache(const char puzzle[N], int which_space){
+bool solve_sudoku_min_arity_cache(char puzzle[N], int which_space){
   sudoku_min_arity_cache min_cache ;
   min_cache.input(puzzle) ;
   min_cache.init_cache();
   bool a = min_cache.solve_sudoku_min_arity_cache(which_space) ;
   if (!solved(min_cache.board) && a == true)
     assert(0);
+  if (a){
+    min_cache.get_result(puzzle) ;
+#if DEBUG_RES
+    printf("%s", puzzle) ;
+#endif 
+  }
   return a ;
 }
 
