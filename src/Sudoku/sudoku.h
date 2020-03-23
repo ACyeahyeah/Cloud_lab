@@ -6,22 +6,14 @@
 #define DEBUG_RES false
 #define DEBUG_MODE false
 #define MULTI_THREAD true
+#define MULTI_THREAD_2 false 
 
 enum { ROW=9, COL=9, N = 81, NEIGHBOR = 20 };
 const int NUM = 9;
 
 extern int neighbors[N][NEIGHBOR];
-// extern int board[N];
-// extern int spaces[N];
-// extern int nspaces;
-// extern int (*chess)[COL];
-// int (*chess)[COL];
-
-// int total_solved = 0;
-// int total = 0;
 
 void init_neighbors();
-// void input(const char in[N]);
 void init_cache();
 
 bool available(int guess, int cell);

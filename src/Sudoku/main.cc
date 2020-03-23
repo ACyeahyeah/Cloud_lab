@@ -30,26 +30,11 @@ int main(int argc, char* argv[])
       solve = solve_sudoku_min_arity_cache;
     else if (argv[2][0] == 'd')
       solve = solve_sudoku_dancing_links;
+  make_mission(fp, solve) ;
   
   int64_t start = now();
-  // while (fgets(puzzle, sizeof puzzle, fp) != NULL) {
-  //   if (strlen(puzzle) >= N) {
-  //     ++total;
-  //     // input(puzzle);
-  //     //if (solve_sudoku_min_arity_cache(0)) {
-  //     //if (solve_sudoku_min_arity(0))
-  //     //if (solve_sudoku_basic(0)) {
-  //     if (solve(puzzle, 0)) {
-  //       ++total_solved;
-  //     }
-  //     else {
-  //       printf("No: %s", puzzle);
-  //     }
-  //   }
-  // }
 
 #if (!MULTI_THREAD)
-  make_mission(fp) ;
   for(int i = 0 ; i < total ; i++){
     args tmp_args ;
     tmp_args.solve_name = solve ;
@@ -60,18 +45,17 @@ int main(int argc, char* argv[])
 #endif
 
 #if (MULTI_THREAD)
-  make_mission(fp) ;
-  for(int i = 0 ; i < total ; i++){
-  // for(int i = 0 ; i < mission_queue.size() ; i++){
+  for(int i = 0 ; i < mission_queue.size() ; i++){
     // args tmp_args ;
     // tmp_args.solve_name = solve ;
     // tmp_args.m = &mission_queue[i] ;
     // tmp_args.which_space = 0 ;
+    // args_queue.push_back(tmp_args) ;
+    // int loc = args_queue.size() ;
+
     args_queue[i].solve_name = solve ;
     args_queue[i].m = &mission_queue[i] ;
     args_queue[i].which_space = 0 ;
-
-
     pthread_t tid ;
     pthread_create(&tid, NULL, solve_sudoku, (void*)&args_queue[i]) ;
     thread_queue.push_back(tid) ;
@@ -85,10 +69,9 @@ int main(int argc, char* argv[])
   int64_t end = now();
   double sec = (end-start)/1000000.0;
   printf("\n--------------------------------------------------------------------\n") ;
-  for(int i = 0 ; i < total ; i++){
-  // for(int i = 0 ; i < mission_queue.size() ; i++){
+  for(int i = 0 ; i < mission_queue.size() ; i++){
     // if(mission_queue[i].sovle)
-      printf("%d %d %s", i+1, mission_queue[i].sovle, mission_queue[i].puzzle) ;
+      printf("%s", mission_queue[i].puzzle) ;
     // else 
     //   printf("false %d\n", i+1) ;
   }
