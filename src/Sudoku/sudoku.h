@@ -5,9 +5,10 @@
 
 #define DEBUG_RES false
 #define DEBUG_MODE false
-#define MULTI_THREAD true
-#define MULTI_THREAD_2 false 
+#define MULTI_THREAD false
+#define MULTI_THREAD_2 true
 
+const int SYS_THREAD_NUM = 4 ;
 enum { ROW=9, COL=9, N = 81, NEIGHBOR = 20 };
 const int NUM = 9;
 

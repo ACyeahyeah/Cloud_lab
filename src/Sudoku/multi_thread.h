@@ -9,6 +9,7 @@
 
 extern int total_solved ;
 extern int total ;
+extern int next_mission ;
 
 extern pthread_mutex_t total_m ;
 extern pthread_mutex_t total_s_m ;
@@ -34,4 +35,5 @@ extern std::vector<args> args_queue ;
 
 void make_mission(FILE *fp, bool (*solve)(char * , int)) ;
 void* solve_sudoku(void *arg) ;
+void* solve_thread(void *arg) ;
 #endif

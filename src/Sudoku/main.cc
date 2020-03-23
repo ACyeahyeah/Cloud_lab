@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
   
   int64_t start = now();
 
-#if (!MULTI_THREAD)
+#if (!MULTI_THREAD && !MULTI_THREAD_2)
   for(int i = 0 ; i < total ; i++){
     args tmp_args ;
     tmp_args.solve_name = solve ;
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
   }
 #endif
 
-#if (MULTI_THREAD)
+#if (MULTI_THREAD && !MULTI_THREAD_2)
   for(int i = 0 ; i < mission_queue.size() ; i++){
     // args tmp_args ;
     // tmp_args.solve_name = solve ;
@@ -61,7 +61,23 @@ int main(int argc, char* argv[])
     thread_queue.push_back(tid) ;
   }
   // sleep(3) ;
-  for(int i = 0 ; i <= thread_queue.size() ; i++){
+  for(int i = 0 ; i < thread_queue.size() ; i++){
+    pthread_join(thread_queue[i], NULL) ;
+  }
+#endif
+
+#if (!MULTI_THREAD && MULTI_THREAD_2)
+
+  args tmp_arg ;
+  tmp_arg.solve_name = solve ;
+  for(int i = 0 ; i < SYS_THREAD_NUM ; i++){
+    pthread_t tid ;
+    printf("%d is creating", i+1) ;
+    pthread_create(&tid, NULL, solve_thread, (void*)&tmp_arg) ;
+    printf("%d created", i+1) ;
+    thread_queue.push_back(tid) ;
+  }
+  for(int i = 0 ; i < SYS_THREAD_NUM ; i++){
     pthread_join(thread_queue[i], NULL) ;
   }
 #endif

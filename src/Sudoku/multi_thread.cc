@@ -8,11 +8,13 @@
 #include "sudoku.h"
 #include "multi_thread.h"
 
-int total_solved;
-int total;
+int total_solved = 0;
+int total = 0;
+int next_mission = 0;
 
 pthread_mutex_t total_m ;
 pthread_mutex_t total_s_m ;
+pthread_mutex_t next_mission_m ;
 
 std::vector<mission> mission_queue ; //vector does not support multi threads
 std::vector<pthread_t> thread_queue ;
@@ -43,7 +45,7 @@ void make_mission(FILE *fp, bool (*solve)(char * , int)){
     }
 }
 
-#if (!MULTI_THREAD)
+#if (!MULTI_THREAD && !MULTI_THREAD_2)
 void* solve_sudoku(void *arg){
     args *tmp_args = (args*)arg ;
     bool (*solve)(char * , int) = tmp_args->solve_name ;
@@ -60,25 +62,53 @@ void* solve_sudoku(void *arg){
 }
 #endif
 
-#if (MULTI_THREAD)
+#if (MULTI_THREAD && !MULTI_THREAD_2)
 void* solve_sudoku(void *arg){
     args* tmp_args = (args*)arg ;
     bool (*solve)(char * , int) = tmp_args->solve_name ;
     if (strlen((tmp_args->m)->puzzle) >= N) {
-        // pthread_mutex_lock(&total_m) ;
-        // ++total;
-        // pthread_mutex_unlock(&total_m) ;
         if (solve((tmp_args->m)->puzzle, tmp_args->which_space)) {
             pthread_mutex_lock(&total_s_m) ;
             (tmp_args->m)->sovle = true ;
-            // pthread_mutex_lock(&total_s_m) ;
             ++total_solved;
             pthread_mutex_unlock(&total_s_m) ;
         }
         else {
             printf("No: %s", (tmp_args->m)->puzzle);
         }
-        // pthread_mutex_unlock(&total_m) ;
+    }
+}
+#endif
+
+#if (!MULTI_THREAD && MULTI_THREAD_2)
+void* solve_sudoku(void* arg){
+    args* tmp_args = (args*)arg ;
+    bool (*solve)(char * , int) = tmp_args->solve_name ;
+    if (strlen((tmp_args->m)->puzzle) >= N) {
+        if (solve((tmp_args->m)->puzzle, tmp_args->which_space)) {
+            pthread_mutex_lock(&total_s_m) ;
+            (tmp_args->m)->sovle = true ;
+            ++total_solved;
+            pthread_mutex_unlock(&total_s_m) ;
+        }
+        else {
+            printf("No: %s", (tmp_args->m)->puzzle);
+        }
+    }
+}
+void* solve_thread(void* arg){
+    args *tmp_arg = (args *)arg ;
+    bool (*solve)(char * , int) = tmp_arg->solve_name ;
+    while (next_mission < total)
+    {
+        pthread_mutex_lock(&next_mission_m) ;
+        int i = next_mission ;
+        next_mission++ ;
+        pthread_mutex_unlock(&next_mission_m) ;
+        args_queue[i].solve_name = solve ;
+        args_queue[i].m = &mission_queue[i] ;
+        args_queue[i].which_space = 0 ;
+        solve_sudoku(&args_queue[i]) ;
     }
 }
 #endif
