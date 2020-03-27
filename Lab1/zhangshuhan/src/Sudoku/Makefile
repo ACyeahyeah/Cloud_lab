@@ -8,7 +8,7 @@ MULTITHREAD = multi_thread.cc
 
 all: sudoku
 
-sudoku: $(BASICFILE)
+sudoku: $(BASICFILE) $(MULTITHREAD)
 	g++ -O2 -o $@ $(BASICFILE) $(MULTITHREAD) $(THREADFLAGS) 
 
 run:

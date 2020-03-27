@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <vector>
 
 #ifndef SUDOKU_H
 #define SUDOKU_H
@@ -8,7 +9,6 @@
 #define MULTI_THREAD false
 #define MULTI_THREAD_2 true
 
-const int SYS_THREAD_NUM = 4 ;
 enum { ROW=9, COL=9, N = 81, NEIGHBOR = 20 };
 const int NUM = 9;
 

@@ -1,6 +1,7 @@
 #include<pthread.h>
+#include <semaphore.h>
 #include<vector>
-#include <stdio.h>
+#include <iostream>
 #include <string.h>
 
 
@@ -10,11 +11,18 @@
 
 int total_solved = 0;
 int total = 0;
+int total_mission = 0;
 int next_mission = 0;
+
+std::vector<file> file_list ;
+int file_now = 0 ;
+int file_size = 0 ;
 
 pthread_mutex_t total_m ;
 pthread_mutex_t total_s_m ;
 pthread_mutex_t next_mission_m ;
+pthread_mutex_t file_input_m ;
+bool done_all = false ;
 
 std::vector<mission> mission_queue ; //vector does not support multi threads
 std::vector<pthread_t> thread_queue ;
@@ -22,11 +30,42 @@ std::vector<args> args_queue ;
 // mission mission_queue[1005] ;
 // args args_queue[1005] ;
 
+
+void* input_mission_file(void *arg){
+    char file_name[128] ;
+    while(1){
+        std::cin.getline(file_name, 128) ;
+        if(strcmp(file_name, "") == 0){
+            continue ;
+        }
+        else {
+            file file_tmp ;
+            pthread_mutex_unlock(&file_input_m) ;
+            file_list.push_back(file_tmp) ;
+            file_size++ ;
+            pthread_mutex_unlock(&file_input_m) ;
+            strcpy(file_list[file_size-1].file_name, file_name) ;
+        }
+    }
+}
+
+void output_mission(){
+    for(int i = 0 ; i < mission_queue.size() ; i++){
+      printf("%s", mission_queue[i].puzzle) ;
+    }
+}
+
+
 // vector version to make missions
 void make_mission(FILE *fp, bool (*solve)(char * , int)){
+    mission_queue.clear() ;
+    total_mission = 0;
+    next_mission = 0;
+
     char puzzle[128] ;
     while (fgets(puzzle, sizeof puzzle, fp) != NULL) {
         total++ ;
+        total_mission++ ;
         if (strlen(puzzle) >= N) {
             mission tmp ;
             tmp.sovle = false ;
@@ -36,14 +75,10 @@ void make_mission(FILE *fp, bool (*solve)(char * , int)){
 
             args tmp_args ;
             args_queue.push_back(tmp_args) ;
-
-            // int tmp = mission_queue.size()-1 ;
-            // args_queue[tmp].solve_name = solve ;
-            // args_queue[tmp].m = &mission_queue[tmp] ;
-            // args_queue[tmp].which_space = 0 ;
         }
     }
 }
+
 
 #if (!MULTI_THREAD && !MULTI_THREAD_2)
 void* solve_sudoku(void *arg){
@@ -99,7 +134,7 @@ void* solve_sudoku(void* arg){
 void* solve_thread(void* arg){
     args *tmp_arg = (args *)arg ;
     bool (*solve)(char * , int) = tmp_arg->solve_name ;
-    while (next_mission < total)
+    while (next_mission < total_mission)
     {
         pthread_mutex_lock(&next_mission_m) ;
         int i = next_mission ;
